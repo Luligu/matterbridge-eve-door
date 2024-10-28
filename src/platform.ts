@@ -9,6 +9,14 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
+
+    // Verify that Matterbridge is the correct version
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.0')) {
+      throw new Error(
+        `This plugin requires Matterbridge version >= "1.6.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+      );
+    }
+
     this.log.info('Initializing platform:', this.config.name);
   }
 
@@ -46,7 +54,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
         let contact = this.door.getClusterServerById(BooleanState.Cluster.id)?.getStateValueAttribute();
         contact = !contact;
         this.door.getClusterServerById(BooleanState.Cluster.id)?.setStateValueAttribute(contact);
-        this.door.getClusterServerById(BooleanState.Cluster.id)?.triggerStateChangeEvent({ stateValue: contact });
+        if (this.door.number) this.door.getClusterServerById(BooleanState.Cluster.id)?.triggerStateChangeEvent({ stateValue: contact });
         if (contact === false) this.history.addToTimesOpened();
         this.history.setLastEvent();
         this.history.addEntry({ time: this.history.now(), contact: contact === true ? 0 : 1 });
