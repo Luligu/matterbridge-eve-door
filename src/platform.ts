@@ -1,4 +1,17 @@
-import { DeviceTypes, BooleanState, PlatformConfig, Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform, powerSource } from 'matterbridge';
+import {
+  BooleanState,
+  PlatformConfig,
+  Matterbridge,
+  MatterbridgeDevice,
+  MatterbridgeAccessoryPlatform,
+  powerSource,
+  MatterbridgeEndpoint,
+  AtLeastOne,
+  DeviceTypeDefinition,
+  EndpointOptions,
+  contactSensor,
+  PowerSource,
+} from 'matterbridge';
 import { MatterHistory } from 'matter-history';
 import { AnsiLogger } from 'matterbridge/logger';
 
@@ -7,13 +20,20 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   history: MatterHistory | undefined;
   interval: NodeJS.Timeout | undefined;
 
+  createMutableDevice(definition: DeviceTypeDefinition | AtLeastOne<DeviceTypeDefinition>, options: EndpointOptions = {}, debug = false): MatterbridgeDevice {
+    let device: MatterbridgeDevice;
+    if (this.matterbridge.edge === true) device = new MatterbridgeEndpoint(definition, options, debug) as unknown as MatterbridgeDevice;
+    else device = new MatterbridgeDevice(definition, options, debug);
+    return device;
+  }
+
   constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.0')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.6')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "1.6.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "1.6.6". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
       );
     }
 
@@ -23,14 +43,12 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory });
+    this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory, edge: this.matterbridge.edge });
 
-    this.door = new MatterbridgeDevice(DeviceTypes.CONTACT_SENSOR);
+    this.door = this.createMutableDevice([contactSensor, powerSource], { uniqueStorageKey: 'EveDoor' }, this.config.debug as boolean);
     this.door.createDefaultIdentifyClusterServer();
     this.door.createDefaultBasicInformationClusterServer('Eve door', '0x88030475', 4874, 'Eve Systems', 77, 'Eve Door 20EBN9901', 1144, '1.2.8');
     this.door.createDefaultBooleanStateClusterServer(true);
-
-    this.door.addDeviceType(powerSource);
     this.door.createDefaultPowerSourceReplaceableBatteryClusterServer(75);
 
     // Add the EveHistory cluster to the device as last cluster and call autoPilot
@@ -40,7 +58,12 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     await this.registerDevice(this.door);
 
     this.door.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
-      this.log.warn(`Command identify called identifyTime:${identifyTime}`);
+      this.log.warn(`Command identify called identifyTime ${identifyTime}`);
+      this.history?.logHistory(false);
+    });
+
+    this.door.addCommandHandler('triggerEffect', async ({ request: { effectIdentifier, effectVariant } }) => {
+      this.log.warn(`Command triggerEffect called effect ${effectIdentifier} variant ${effectVariant}`);
       this.history?.logHistory(false);
     });
   }
@@ -49,16 +72,19 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     this.log.info('onConfigure called');
 
     this.interval = setInterval(
-      () => {
+      async () => {
         if (!this.door || !this.history) return;
-        let contact = this.door.getClusterServerById(BooleanState.Cluster.id)?.getStateValueAttribute();
+        let contact = this.door.getAttribute(BooleanState.Cluster.id, 'stateValue', this.log);
         contact = !contact;
-        this.door.getClusterServerById(BooleanState.Cluster.id)?.setStateValueAttribute(contact);
-        if (this.door.number) this.door.getClusterServerById(BooleanState.Cluster.id)?.triggerStateChangeEvent({ stateValue: contact });
+        await this.door.setAttribute(BooleanState.Cluster.id, 'stateValue', contact, this.log);
+        if (!this.matterbridge.edge && this.door.number) this.door.triggerEvent(BooleanState.Cluster.id, 'stateChange', { stateValue: contact }, this.log);
         if (contact === false) this.history.addToTimesOpened();
         this.history.setLastEvent();
         this.history.addEntry({ time: this.history.now(), contact: contact === true ? 0 : 1 });
         this.log.info(`Set contact to ${contact}`);
+
+        const batteryLevel = this.door.getAttribute(PowerSource.Cluster.id, 'batPercentRemaining', this.log);
+        await this.door.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', batteryLevel + 20 > 200 ? 20 : batteryLevel + 20, this.log);
       },
       60 * 1000 + 100,
     );
