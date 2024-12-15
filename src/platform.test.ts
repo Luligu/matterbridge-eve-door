@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { ClusterServerObj, Identify, Matterbridge, PlatformConfig } from 'matterbridge';
@@ -6,13 +7,9 @@ import { EveDoorPlatform } from './platform';
 import { jest } from '@jest/globals';
 
 describe('TestPlatform', () => {
-  let mockMatterbridge: Matterbridge;
-  let mockLog: AnsiLogger;
-  let mockConfig: PlatformConfig;
   let testPlatform: EveDoorPlatform;
 
   async function invokeCommands(cluster: ClusterServerObj, data?: Record<string, boolean | number | bigint | string | object | null | undefined>): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commands = (cluster as any).commands as object;
 
     for (const [key, value] of Object.entries(commands)) {
@@ -21,15 +18,13 @@ describe('TestPlatform', () => {
   }
 
   async function invokeCommand(cluster: ClusterServerObj, command: string, data?: Record<string, boolean | number | bigint | string | object | null | undefined>): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commands = (cluster as any).commands as object;
     for (const [key, value] of Object.entries(commands)) {
       if (key === command && typeof value.handler === 'function') await value.handler(data ?? {});
     }
   }
 
-  // eslint-disable-next-line prefer-const
-  mockMatterbridge = {
+  const mockMatterbridge = {
     addBridgedDevice: jest.fn(),
     matterbridgeDirectory: '',
     matterbridgePluginDirectory: 'temp',
@@ -37,29 +32,29 @@ describe('TestPlatform', () => {
     matterbridgeVersion: '1.6.6',
     removeAllBridgedDevices: jest.fn(),
   } as unknown as Matterbridge;
-  // eslint-disable-next-line prefer-const
-  mockLog = {
-    fatal: jest.fn().mockImplementation((message) => {
-      // console.log(message);
+
+  const mockLog = {
+    fatal: jest.fn((message: string, ...parameters: any[]) => {
+      // console.error('mockLog.fatal', message, parameters);
     }),
-    error: jest.fn().mockImplementation((message) => {
-      // console.log(message);
+    error: jest.fn((message: string, ...parameters: any[]) => {
+      // console.error('mockLog.error', message, parameters);
     }),
-    warn: jest.fn().mockImplementation((message) => {
-      // console.log(message);
+    warn: jest.fn((message: string, ...parameters: any[]) => {
+      // console.error('mockLog.warn', message, parameters);
     }),
-    notice: jest.fn().mockImplementation((message) => {
-      // console.log(message);
+    notice: jest.fn((message: string, ...parameters: any[]) => {
+      // console.error('mockLog.notice', message, parameters);
     }),
-    info: jest.fn().mockImplementation((message) => {
-      // console.log(message);
+    info: jest.fn((message: string, ...parameters: any[]) => {
+      // console.error('mockLog.info', message, parameters);
     }),
-    debug: jest.fn().mockImplementation((message) => {
-      // console.log(message);
+    debug: jest.fn((message: string, ...parameters: any[]) => {
+      // console.error('mockLog.debug', message, parameters);
     }),
   } as unknown as AnsiLogger;
-  // eslint-disable-next-line prefer-const
-  mockConfig = {
+
+  const mockConfig = {
     'name': 'matterbridge-eve-door',
     'type': 'DynamicPlatform',
     'unregisterOnShutdown': false,
