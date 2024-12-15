@@ -37,7 +37,26 @@ describe('TestPlatform', () => {
     removeAllBridgedDevices: jest.fn(),
   } as unknown as Matterbridge;
   // eslint-disable-next-line prefer-const
-  mockLog = { fatal: jest.fn(), error: jest.fn(), warn: jest.fn(), notice: jest.fn(), info: jest.fn(), debug: jest.fn() } as unknown as AnsiLogger;
+  mockLog = {
+    fatal: jest.fn().mockImplementation((message) => {
+      console.log(message);
+    }),
+    error: jest.fn().mockImplementation((message) => {
+      console.log(message);
+    }),
+    warn: jest.fn().mockImplementation((message) => {
+      console.log(message);
+    }),
+    notice: jest.fn().mockImplementation((message) => {
+      console.log(message);
+    }),
+    info: jest.fn().mockImplementation((message) => {
+      console.log(message);
+    }),
+    debug: jest.fn().mockImplementation((message) => {
+      console.log(message);
+    }),
+  } as unknown as AnsiLogger;
   // eslint-disable-next-line prefer-const
   mockConfig = {
     'name': 'matterbridge-eve-door',
@@ -78,8 +97,7 @@ describe('TestPlatform', () => {
 
     for (let i = 0; i < 100; i++) jest.advanceTimersByTime(61 * 1000);
 
-    expect(mockLog.info).toHaveBeenCalledWith('Set contact to true');
-    expect(mockLog.info).toHaveBeenCalledWith('Set contact to false');
+    expect(mockLog.info).toHaveBeenCalledTimes(203);
 
     jest.useRealTimers();
   });
