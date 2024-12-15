@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { ClusterServerObj, Identify, Matterbridge, PlatformConfig } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { EveDoorPlatform } from './platform';
@@ -12,13 +14,12 @@ describe('TestPlatform', () => {
   async function invokeCommands(cluster: ClusterServerObj, data?: Record<string, boolean | number | bigint | string | object | null | undefined>): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commands = (cluster as any).commands as object;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     for (const [key, value] of Object.entries(commands)) {
       if (typeof value.handler === 'function') await value.handler(data ?? {});
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function invokeCommand(cluster: ClusterServerObj, command: string, data?: Record<string, boolean | number | bigint | string | object | null | undefined>): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commands = (cluster as any).commands as object;
@@ -39,22 +40,22 @@ describe('TestPlatform', () => {
   // eslint-disable-next-line prefer-const
   mockLog = {
     fatal: jest.fn().mockImplementation((message) => {
-      console.log(message);
+      // console.log(message);
     }),
     error: jest.fn().mockImplementation((message) => {
-      console.log(message);
+      // console.log(message);
     }),
     warn: jest.fn().mockImplementation((message) => {
-      console.log(message);
+      // console.log(message);
     }),
     notice: jest.fn().mockImplementation((message) => {
-      console.log(message);
+      // console.log(message);
     }),
     info: jest.fn().mockImplementation((message) => {
-      console.log(message);
+      // console.log(message);
     }),
     debug: jest.fn().mockImplementation((message) => {
-      console.log(message);
+      // console.log(message);
     }),
   } as unknown as AnsiLogger;
   // eslint-disable-next-line prefer-const
