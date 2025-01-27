@@ -23,7 +23,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory, edge: this.matterbridge.edge });
+    this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory });
 
     this.door = new MatterbridgeEndpoint([contactSensor, powerSource], { uniqueStorageKey: 'Eve door' }, this.config.debug as boolean);
     this.door.createDefaultIdentifyClusterServer();
