@@ -88,13 +88,13 @@ describe('TestPlatform', () => {
     expect(mockLog.info).toHaveBeenCalledWith('onStart called with reason:', 'Test reason');
     expect(testPlatform.door).toBeDefined();
     if (!testPlatform.door) return;
-    expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(5); // ["descriptor", "matterbridge", "identify", "booleanState", "powerSource"]
+    expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(6); // ["descriptor", "matterbridge", "identify", "booleanState", "powerSource", "eveHistory"]
   });
 
   it('should call onConfigure', async () => {
     expect(testPlatform.door).toBeDefined();
     if (!testPlatform.door) return;
-    expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(5);
+    expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(6); // ["descriptor", "matterbridge", "identify", "booleanState", "powerSource", "eveHistory"]
 
     jest.useFakeTimers();
 
@@ -112,7 +112,7 @@ describe('TestPlatform', () => {
   it('should execute the commandHandlers', async () => {
     expect(testPlatform.door).toBeDefined();
     if (!testPlatform.door) return;
-    expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(5);
+    expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(6); // ["descriptor", "matterbridge", "identify", "booleanState", "powerSource", "eveHistory"]
     await testPlatform.door.executeCommandHandler('identify', { identifyTime: 5 });
     await testPlatform.door.executeCommandHandler('triggerEffect', { effectIdentifier: Identify.EffectIdentifier.Blink, effectVariant: Identify.EffectVariant.Default });
   });
