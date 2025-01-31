@@ -1,4 +1,5 @@
-import { BooleanState, PlatformConfig, Matterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor, PowerSource } from 'matterbridge';
+import { PlatformConfig, Matterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor } from 'matterbridge';
+import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 import { MatterHistory } from 'matter-history';
 import { AnsiLogger } from 'matterbridge/logger';
 
