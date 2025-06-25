@@ -1,7 +1,7 @@
-import { PlatformConfig, Matterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor } from 'matterbridge';
-import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 import { MatterHistory } from 'matter-history';
+import { PlatformConfig, Matterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
+import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 
 export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   door: MatterbridgeEndpoint | undefined;

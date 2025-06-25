@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Matterbridge, MatterbridgeEndpoint, PlatformConfig } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
-import { EveDoorPlatform } from './platform.js';
-import initializePlugin from './index';
 import { jest } from '@jest/globals';
+
+import { EveDoorPlatform } from './platform.ts';
+import initializePlugin from './index.ts';
 
 describe('initializePlugin', () => {
   const mockLog = {
@@ -61,9 +60,9 @@ describe('initializePlugin', () => {
     debug: false,
   } as PlatformConfig;
 
-  it('should return an instance of TestPlatform', () => {
-    const result = initializePlugin(mockMatterbridge, mockLog, mockConfig);
-    expect(result).toBeInstanceOf(EveDoorPlatform);
-    result.onShutdown();
+  it('should return an instance of TestPlatform', async () => {
+    const platform = initializePlugin(mockMatterbridge, mockLog, mockConfig);
+    expect(platform).toBeInstanceOf(EveDoorPlatform);
+    await platform.onShutdown();
   });
 });
