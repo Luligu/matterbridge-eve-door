@@ -63,10 +63,10 @@ describe('TestPlatform', () => {
   } as unknown as Matterbridge;
 
   const mockConfig = {
-    'name': 'matterbridge-eve-door',
-    'type': 'DynamicPlatform',
-    'unregisterOnShutdown': false,
-    'debug': false,
+    name: 'matterbridge-eve-door',
+    type: 'DynamicPlatform',
+    unregisterOnShutdown: false,
+    debug: false,
   } as PlatformConfig;
 
   beforeEach(() => {
