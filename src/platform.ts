@@ -26,11 +26,11 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
 
     this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory });
 
-    this.door = new MatterbridgeEndpoint([contactSensor, powerSource], { uniqueStorageKey: 'Eve door' }, this.config.debug as boolean);
+    this.door = new MatterbridgeEndpoint([contactSensor, powerSource], { uniqueStorageKey: 'Eve door', mode: 'server' }, this.config.debug as boolean);
     this.door.createDefaultIdentifyClusterServer();
     this.door.createDefaultBasicInformationClusterServer('Eve door', '0x88030475', 4874, 'Eve Systems', 77, 'Eve Door 20EBN9901', 1144, '1.2.8');
     this.door.createDefaultBooleanStateClusterServer(true);
-    this.door.createDefaultPowerSourceReplaceableBatteryClusterServer(75);
+    this.door.createDefaultPowerSourceReplaceableBatteryClusterServer(75, PowerSource.BatChargeLevel.Ok, 3000, 'CR2450', 1);
 
     // Add the EveHistory cluster to the device as last cluster and call autoPilot
     this.history.createDoorEveHistoryClusterServer(this.door, this.log);
@@ -64,8 +64,16 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
         this.history.addEntry({ time: this.history.now(), contact: contact === true ? 0 : 1 });
         this.log.info(`Set contact to ${contact}`);
 
-        const batteryLevel = this.door.getAttribute(PowerSource.Cluster.id, 'batPercentRemaining', this.log);
-        await this.door.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', batteryLevel + 20 > 200 ? 20 : batteryLevel + 20, this.log);
+        let batteryLevel = this.door.getAttribute(PowerSource.Cluster.id, 'batPercentRemaining', this.log);
+        batteryLevel = batteryLevel + 20 > 200 ? 10 : batteryLevel + 10;
+        await this.door.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', batteryLevel, this.log);
+        if (batteryLevel >= 40) {
+          await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Ok, this.log);
+        } else if (batteryLevel >= 20) {
+          await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Warning, this.log);
+        } else {
+          await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Critical, this.log);
+        }
       },
       60 * 1000 + 100,
     );
