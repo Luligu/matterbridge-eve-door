@@ -3,6 +3,19 @@ import { PlatformConfig, PlatformMatterbridge, MatterbridgeAccessoryPlatform, po
 import { AnsiLogger } from 'matterbridge/logger';
 import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 
+/**
+ * This is the standard interface for MatterBridge plugins.
+ * Each plugin should export a default function that follows this signature.
+ *
+ *  @param {PlatformMatterbridge} matterbridge - The Matterbridge instance.
+ *  @param {AnsiLogger} log - The logger instance for logging messages.
+ *  @param {PlatformConfig} config - The configuration for the platform.
+ *  @returns {EveDoorPlatform} - An instance of the EveDoorPlatform.
+ */
+export default function initializePlugin(matterbridge: PlatformMatterbridge, log: AnsiLogger, config: PlatformConfig): EveDoorPlatform {
+  return new EveDoorPlatform(matterbridge, log, config);
+}
+
 export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   door: MatterbridgeEndpoint | undefined;
   history: MatterHistory | undefined;
