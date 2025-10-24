@@ -1,15 +1,18 @@
-import { Matterbridge, MatterbridgeEndpoint, PlatformConfig } from 'matterbridge';
-import { Identify, BooleanState, PowerSource } from 'matterbridge/matter/clusters';
+import path from 'node:path';
+
+import { MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge } from 'matterbridge';
+import { Identify } from 'matterbridge/matter/clusters';
 import { AnsiLogger } from 'matterbridge/logger';
 import { jest } from '@jest/globals';
 
 import { EveDoorPlatform } from './platform.ts';
+import { setupTest } from './jestHelpers.ts';
+
+// Setup the test environment
+setupTest('Platform', false);
 
 describe('TestPlatform', () => {
   let testPlatform: EveDoorPlatform;
-
-  // Spy on and mock AnsiLogger.log
-  const loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log').mockImplementation((level: string, message: string, ...parameters: any[]) => {});
 
   const mockLog = {
     fatal: jest.fn((message: string, ...parameters: any[]) => {}),
@@ -20,25 +23,26 @@ describe('TestPlatform', () => {
     debug: jest.fn((message: string, ...parameters: any[]) => {}),
   } as unknown as AnsiLogger;
 
+  const mockConfig: PlatformConfig = {
+    name: 'matterbridge-eve-door',
+    type: 'DynamicPlatform',
+    version: '1.0.0',
+    unregisterOnShutdown: false,
+    debug: false,
+  };
+
   const mockMatterbridge = {
-    matterbridgeDirectory: './jest/matterbridge',
-    matterbridgePluginDirectory: './jest/plugins',
+    homeDirectory: path.join('jest', 'Platform'),
+    matterbridgeDirectory: path.join('jest', 'Platform', '.matterbridge'),
+    matterbridgePluginDirectory: path.join('jest', 'Platform', 'Matterbridge'),
+    matterbridgeCertDirectory: path.join('jest', 'Platform', '.mattercert'),
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
-    matterbridgeVersion: '3.0.0',
+    matterbridgeVersion: '3.3.0',
     log: mockLog,
-    getDevices: jest.fn(() => []),
-    getPlugins: jest.fn(() => []),
     addBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {}),
     removeBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {}),
     removeAllBridgedEndpoints: jest.fn(async (pluginName: string) => {}),
-  } as unknown as Matterbridge;
-
-  const mockConfig = {
-    name: 'matterbridge-eve-door',
-    type: 'DynamicPlatform',
-    unregisterOnShutdown: false,
-    debug: false,
-  } as PlatformConfig;
+  } as unknown as PlatformMatterbridge;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,7 +51,7 @@ describe('TestPlatform', () => {
   it('should not initialize platform with wrong version', () => {
     mockMatterbridge.matterbridgeVersion = '1.5.0';
     expect(() => (testPlatform = new EveDoorPlatform(mockMatterbridge, mockLog, mockConfig))).toThrow();
-    mockMatterbridge.matterbridgeVersion = '3.0.0';
+    mockMatterbridge.matterbridgeVersion = '3.3.0';
   });
 
   it('should initialize platform with config name', () => {

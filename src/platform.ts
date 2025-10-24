@@ -1,5 +1,5 @@
 import { MatterHistory } from 'matter-history';
-import { PlatformConfig, Matterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor } from 'matterbridge';
+import { PlatformConfig, PlatformMatterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 
@@ -8,13 +8,13 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   history: MatterHistory | undefined;
   interval: NodeJS.Timeout | undefined;
 
-  constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
+  constructor(matterbridge: PlatformMatterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.0.0')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.3.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "3.0.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "3.3.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
       );
     }
 
