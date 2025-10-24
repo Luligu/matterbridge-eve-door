@@ -1,4 +1,4 @@
-const MATTER_PORT = 6002;
+const MATTER_PORT = 6000;
 const NAME = 'Platform';
 const HOMEDIR = path.join('jest', NAME);
 
@@ -43,16 +43,19 @@ describe('TestPlatform', () => {
   beforeAll(async () => {
     matterbridge = await createMatterbridgeEnvironment(NAME);
     [server, aggregator] = await startMatterbridgeEnvironment(matterbridge, MATTER_PORT);
-    log = new AnsiLogger({ logName: 'TestPlatform', logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
+    log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
   });
 
   beforeEach(() => {
+    // Reset the mock calls before each test
     jest.clearAllMocks();
   });
 
   afterAll(async () => {
     await stopMatterbridgeEnvironment(matterbridge, server, aggregator);
     await destroyMatterbridgeEnvironment(matterbridge);
+    // Restore all mocks
+    jest.restoreAllMocks();
   });
 
   it('should return an instance of TestPlatform', async () => {

@@ -21,8 +21,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- [package]: Bumped platform to v. 2.0.0.
 - [package]: Updated dependencies.
-- [package]: Bumped package to automator version 2.0.9
+- [package]: Bumped package to automator v. 2.0.9
 - [jest]: Updated jestHelpers to v. 1.0.9.
 - [package]: Require matterbridge 3.3.0.
 - [index]: Updated to new signature PlatformMatterbridge.
