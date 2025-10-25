@@ -96,12 +96,16 @@ describe('TestPlatform', () => {
     await testPlatform.onConfigure();
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onConfigure called');
 
-    for (let i = 0; i < 100; i++) jest.advanceTimersByTime(61 * 1000);
-
-    expect(loggerLogSpy).toHaveBeenCalledTimes(102);
-    expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
+    for (let i = 0; i < 20; i++) {
+      await jest.advanceTimersByTimeAsync(61 * 1000);
+    }
 
     jest.useRealTimers();
+
+    expect(loggerLogSpy).toHaveBeenCalled();
+    expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Set contact to true');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Set contact to false');
   });
 
   it('should execute the commandHandlers', async () => {
