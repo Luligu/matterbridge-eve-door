@@ -34,7 +34,7 @@ describe('TestPlatform', () => {
 
   const config: PlatformConfig = {
     name: 'matterbridge-eve-door',
-    type: 'DynamicPlatform',
+    type: 'AccessoryPlatform',
     version: '1.0.0',
     unregisterOnShutdown: false,
     debug: false,
@@ -96,6 +96,7 @@ describe('TestPlatform', () => {
     await testPlatform.onConfigure();
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onConfigure called');
 
+    // Simulate multiple interval executions
     for (let i = 0; i < 20; i++) {
       await jest.advanceTimersByTimeAsync(61 * 1000);
     }

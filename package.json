@@ -39,7 +39,7 @@
     "cleanBuild": "npm shx rm -rf tsconfig.tsbuildinfo dist && npm run build",
     "cleanBuildProduction": "npx shx rm -rf tsconfig.tsbuildinfo dist && npm run buildProduction",
     "watch": "tsc --watch",
-    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers=100%",
+    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers=100% --forceExit",
     "test:verbose": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers=100% --verbose",
     "test:watch": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers=100% --watch",
     "test:coverage": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers=100% --verbose --coverage",
