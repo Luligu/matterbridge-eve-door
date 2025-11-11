@@ -4,19 +4,16 @@ const HOMEDIR = path.join('jest', NAME);
 
 import path from 'node:path';
 
-import { Matterbridge, PlatformConfig } from 'matterbridge';
+import { PlatformConfig } from 'matterbridge';
 import { Identify } from 'matterbridge/matter/clusters';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { jest } from '@jest/globals';
-import { Endpoint, ServerNode } from 'matterbridge/matter';
-import { AggregatorEndpoint } from 'matterbridge/matter/endpoints';
 
 import initializePlugin, { EveDoorPlatform } from './module.js';
 import {
   createMatterbridgeEnvironment,
   destroyMatterbridgeEnvironment,
   loggerLogSpy,
-  setDebug,
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
