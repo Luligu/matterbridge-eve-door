@@ -20,17 +20,15 @@ import {
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
-} from './jestHelpers.ts';
+  matterbridge,
+} from './utils/jestHelpers.ts';
 
 // Setup the test environment
 setupTest(NAME, false);
 
 describe('TestPlatform', () => {
-  let matterbridge: Matterbridge;
-  let server: ServerNode<ServerNode.RootEndpoint>;
-  let aggregator: Endpoint<AggregatorEndpoint>;
   let testPlatform: EveDoorPlatform;
-  let log: AnsiLogger;
+  const log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
 
   const config: PlatformConfig = {
     name: 'matterbridge-eve-door',
@@ -41,9 +39,8 @@ describe('TestPlatform', () => {
   };
 
   beforeAll(async () => {
-    matterbridge = await createMatterbridgeEnvironment(NAME);
-    [server, aggregator] = await startMatterbridgeEnvironment(matterbridge, MATTER_PORT);
-    log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
+    await createMatterbridgeEnvironment(NAME);
+    await startMatterbridgeEnvironment(MATTER_PORT);
   });
 
   beforeEach(() => {
@@ -52,8 +49,8 @@ describe('TestPlatform', () => {
   });
 
   afterAll(async () => {
-    await stopMatterbridgeEnvironment(matterbridge, server, aggregator);
-    await destroyMatterbridgeEnvironment(matterbridge);
+    await stopMatterbridgeEnvironment();
+    await destroyMatterbridgeEnvironment();
     // Restore all mocks
     jest.restoreAllMocks();
   });
