@@ -65,7 +65,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     this.door = new MatterbridgeEndpoint(
       [contactSensor, powerSource],
       { id: 'Eve door', mode: this.matterbridge.bridgeMode === 'bridge' ? 'server' : undefined },
-      this.config.debug as boolean,
+      this.config.debug,
     );
     this.door.createDefaultIdentifyClusterServer();
     this.door.createDefaultBasicInformationClusterServer('Eve door', '0x88030475', 4874, 'Eve Systems', 77, 'Eve Door 20EBN9901', 1144, '1.2.8');
