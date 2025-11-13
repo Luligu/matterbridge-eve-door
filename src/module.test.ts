@@ -18,6 +18,7 @@ import {
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
   matterbridge,
+  addMatterbridgePlatform,
 } from './utils/jestHelpers.ts';
 
 // Setup the test environment
@@ -66,10 +67,8 @@ describe('TestPlatform', () => {
 
   it('should initialize platform with config name', () => {
     matterbridge.plugins.logLevel = LogLevel.DEBUG;
-    // @ts-expect-error accessing private member for testing
-    matterbridge.plugins._plugins.set('matterbridge-jest', {});
     testPlatform = new EveDoorPlatform(matterbridge, log, config);
-    testPlatform['name'] = 'matterbridge-jest';
+    addMatterbridgePlatform(testPlatform);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
   });
 
