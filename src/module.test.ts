@@ -6,10 +6,8 @@ import path from 'node:path';
 
 import { PlatformConfig } from 'matterbridge';
 import { Identify } from 'matterbridge/matter/clusters';
-import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
+import { LogLevel } from 'matterbridge/logger';
 import { jest } from '@jest/globals';
-
-import initializePlugin, { EveDoorPlatform } from './module.js';
 import {
   createMatterbridgeEnvironment,
   destroyMatterbridgeEnvironment,
@@ -19,14 +17,16 @@ import {
   stopMatterbridgeEnvironment,
   matterbridge,
   addMatterbridgePlatform,
-} from './utils/jestHelpers.ts';
+  log,
+} from 'matterbridge/jestutils';
+
+import initializePlugin, { EveDoorPlatform } from './module.js';
 
 // Setup the test environment
 setupTest(NAME, false);
 
 describe('TestPlatform', () => {
   let testPlatform: EveDoorPlatform;
-  const log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
 
   const config: PlatformConfig = {
     name: 'matterbridge-eve-door',
@@ -62,7 +62,7 @@ describe('TestPlatform', () => {
   it('should not initialize platform with wrong version', () => {
     matterbridge.matterbridgeVersion = '1.5.0';
     expect(() => (testPlatform = new EveDoorPlatform(matterbridge, log, config))).toThrow();
-    matterbridge.matterbridgeVersion = '3.3.0';
+    matterbridge.matterbridgeVersion = '3.4.0';
   });
 
   it('should initialize platform with config name', () => {

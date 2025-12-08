@@ -48,9 +48,9 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.3.0')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.4.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "3.3.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
       );
     }
 
@@ -90,6 +90,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   }
 
   override async onConfigure() {
+    await super.onConfigure();
     this.log.info('onConfigure called');
 
     this.interval = setInterval(
@@ -120,6 +121,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
   }
 
   override async onShutdown(reason?: string) {
+    await super.onShutdown(reason);
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     await this.history?.close();
     clearInterval(this.interval);
