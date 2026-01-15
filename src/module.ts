@@ -74,9 +74,10 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
 
     // Add the EveHistory cluster to the device as last cluster and call autoPilot
     this.history.createDoorEveHistoryClusterServer(this.door, this.log);
-    this.history.autoPilot(this.door);
 
     await this.registerDevice(this.door);
+
+    this.history.autoPilot(this.door);
 
     this.door.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
       this.log.info(`Command identify called identifyTime ${identifyTime}`);
