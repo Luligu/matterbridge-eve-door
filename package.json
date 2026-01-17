@@ -89,7 +89,8 @@
   },
   "files": [
     "dist",
-    "npm-shrinkwrap.json"
+    "npm-shrinkwrap.json",
+    "CHANGELOG.md"
   ],
   "dependencies": {
     "matter-history": "1.1.19",
