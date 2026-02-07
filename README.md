@@ -20,7 +20,7 @@
 
 ---
 
-This plugin shows how to use the Matter history and how to create a passive device in matter.js.
+This plugin shows how to use the Matter history and how to create a passive device in Matterbridge.
 
 It creates a **virtual** contact sensor device that continuously changes state and triggers the corresponding event.
 
