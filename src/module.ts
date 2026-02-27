@@ -22,7 +22,7 @@
  */
 
 import { MatterHistory } from 'matter-history';
-import { PlatformConfig, PlatformMatterbridge, MatterbridgeAccessoryPlatform, powerSource, MatterbridgeEndpoint, contactSensor } from 'matterbridge';
+import { contactSensor, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge, powerSource } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 
