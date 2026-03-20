@@ -106,8 +106,14 @@ describe('TestPlatform', () => {
     expect(testPlatform.door).toBeDefined();
     if (!testPlatform.door) return;
     expect(Object.keys(testPlatform.door.behaviors.supported)).toHaveLength(6); // ["descriptor", "matterbridge", "identify", "booleanState", "powerSource", "eveHistory"]
-    await testPlatform.door.executeCommandHandler('identify', { identifyTime: 5 });
-    await testPlatform.door.executeCommandHandler('triggerEffect', { effectIdentifier: Identify.EffectIdentifier.Blink, effectVariant: Identify.EffectVariant.Default });
+    await testPlatform.door.executeCommandHandler('identify', { identifyTime: 5 }, 'identify', {} as any, testPlatform.door);
+    await testPlatform.door.executeCommandHandler(
+      'triggerEffect',
+      { effectIdentifier: Identify.EffectIdentifier.Blink, effectVariant: Identify.EffectVariant.Default },
+      'identify',
+      {} as any,
+      testPlatform.door,
+    );
   });
 
   it('should call onShutdown with reason', async () => {
