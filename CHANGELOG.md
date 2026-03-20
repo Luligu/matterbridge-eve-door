@@ -42,6 +42,8 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Add `CONTRIBUTING.md`.
 - [package]: Add `STYLEGUIDE.md`.
 
+<a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
+
 ## [2.0.7] - 2026-02-27
 
 ### Added
