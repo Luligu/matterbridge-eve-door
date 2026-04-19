@@ -53,6 +53,8 @@ If you like this project and find it useful, please consider giving it a star on
 - [scripts]: Update package watch script.
 - [scripts]: Add prune-releases script.
 
+<a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
+
 ## [2.0.8] - 2026-03-20
 
 - [package]: Update dependencies.
