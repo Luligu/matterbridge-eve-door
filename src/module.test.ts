@@ -35,6 +35,7 @@ describe('TestPlatform', () => {
   };
 
   beforeAll(async () => {
+    // Create Matterbridge environment
     await createMatterbridgeEnvironment();
     await startMatterbridgeEnvironment(MATTER_PORT, MATTER_CREATE_ONLY);
   });
@@ -45,6 +46,7 @@ describe('TestPlatform', () => {
   });
 
   afterAll(async () => {
+    // Destroy Matterbridge environment
     await stopMatterbridgeEnvironment(MATTER_CREATE_ONLY);
     await destroyMatterbridgeEnvironment(undefined, undefined, !MATTER_CREATE_ONLY);
     // Restore all mocks
