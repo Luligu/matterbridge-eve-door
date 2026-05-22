@@ -25,6 +25,7 @@ import { MatterHistory } from 'matter-history';
 import { contactSensor, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge, powerSource } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
+import { fireAndForget } from 'matterbridge/utils';
 
 /**
  * This is the standard interface for MatterBridge plugins.
@@ -88,12 +89,12 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
 
     this.history.autoPilot(this.door);
 
-    this.door.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
+    this.door.addCommandHandler('identify', ({ request: { identifyTime } }) => {
       this.log.info(`Command identify called identifyTime ${identifyTime}`);
       this.history?.logHistory(false);
     });
 
-    this.door.addCommandHandler('triggerEffect', async ({ request: { effectIdentifier, effectVariant } }) => {
+    this.door.addCommandHandler('triggerEffect', ({ request: { effectIdentifier, effectVariant } }) => {
       this.log.info(`Command triggerEffect called effect ${effectIdentifier} variant ${effectVariant}`);
       this.history?.logHistory(false);
     });
@@ -104,27 +105,33 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     this.log.info('onConfigure called');
 
     this.interval = setInterval(
-      async () => {
-        if (!this.door || !this.history) return;
-        let contact = this.door.getAttribute(BooleanState.Cluster.id, 'stateValue', this.log);
-        contact = !contact;
-        await this.door.setAttribute(BooleanState.Cluster.id, 'stateValue', contact, this.log);
-        await this.door.triggerEvent(BooleanState.Cluster.id, 'stateChange', { stateValue: contact }, this.log);
-        if (contact === false) this.history.addToTimesOpened();
-        this.history.setLastEvent();
-        this.history.addEntry({ time: this.history.now(), contact: contact === true ? 0 : 1 });
-        this.log.info(`Set contact to ${contact}`);
+      () => {
+        fireAndForget(
+          (async () => {
+            if (!this.door || !this.history) return;
+            let contact = this.door.getAttribute(BooleanState.Cluster.id, 'stateValue', this.log);
+            contact = !contact;
+            await this.door.setAttribute(BooleanState.Cluster.id, 'stateValue', contact, this.log);
+            await this.door.triggerEvent(BooleanState.Cluster.id, 'stateChange', { stateValue: contact }, this.log);
+            if (contact === false) this.history.addToTimesOpened();
+            this.history.setLastEvent();
+            this.history.addEntry({ time: this.history.now(), contact: contact === true ? 0 : 1 });
+            this.log.info(`Set contact to ${contact}`);
 
-        let batteryLevel = this.door.getAttribute(PowerSource.Cluster.id, 'batPercentRemaining', this.log);
-        batteryLevel = batteryLevel + 20 > 200 ? 10 : batteryLevel + 10;
-        await this.door.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', batteryLevel, this.log);
-        if (batteryLevel >= 40) {
-          await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Ok, this.log);
-        } else if (batteryLevel >= 20) {
-          await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Warning, this.log);
-        } else {
-          await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Critical, this.log);
-        }
+            let batteryLevel = this.door.getAttribute(PowerSource.Cluster.id, 'batPercentRemaining', this.log);
+            batteryLevel = batteryLevel + 20 > 200 ? 10 : batteryLevel + 10;
+            await this.door.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', batteryLevel, this.log);
+            if (batteryLevel >= 40) {
+              await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Ok, this.log);
+            } else if (batteryLevel >= 20) {
+              await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Warning, this.log);
+            } else {
+              await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Critical, this.log);
+            }
+          })(),
+          this.log,
+          'setInterval',
+        );
       },
       60 * 1000 + 100,
     );
