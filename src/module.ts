@@ -108,6 +108,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
       () => {
         fireAndForget(
           (async () => {
+            // istanbul ignore next
             if (!this.door || !this.history) return;
             let contact = this.door.getAttribute(BooleanState.Cluster.id, 'stateValue', this.log);
             contact = !contact;
