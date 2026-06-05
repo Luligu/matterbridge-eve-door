@@ -49,9 +49,9 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.5.0')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.8.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "3.5.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "3.8.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
       );
     }
 
@@ -81,6 +81,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     );
     this.door.createDefaultBooleanStateClusterServer(true);
     this.door.createDefaultPowerSourceReplaceableBatteryClusterServer(75, PowerSource.BatChargeLevel.Ok, 3000, 'CR2450', 1);
+    this.door.addRequiredClusters();
 
     // Add the EveHistory cluster to the device as last cluster and call autoPilot
     this.history.createDoorEveHistoryClusterServer(this.door, this.log);
