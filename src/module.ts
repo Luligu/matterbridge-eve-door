@@ -22,8 +22,8 @@
  */
 
 import { MatterHistory } from 'matter-history';
-import { contactSensor, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge, powerSource } from 'matterbridge';
-import { AnsiLogger } from 'matterbridge/logger';
+import { contactSensor, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, type PlatformConfig, type PlatformMatterbridge, powerSource } from 'matterbridge';
+import type { AnsiLogger } from 'matterbridge/logger';
 import { BooleanState, PowerSource } from 'matterbridge/matter/clusters';
 import { fireAndForget } from 'matterbridge/utils';
 
@@ -49,19 +49,19 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.8.0')) {
+    if (typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.9.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "3.8.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "3.9.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
       );
     }
 
     this.log.info('Initializing platform:', this.config.name);
   }
 
-  override async onStart(reason?: string) {
+  override async onStart(reason?: string): Promise<void> {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory, enableDebug: this.config.debug as boolean });
+    this.history = new MatterHistory(this.log, 'Eve door', { filePath: this.matterbridge.matterbridgeDirectory, enableDebug: this.config.debug });
 
     this.door = new MatterbridgeEndpoint(
       [contactSensor, powerSource],
@@ -101,34 +101,34 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     });
   }
 
-  override async onConfigure() {
+  override async onConfigure(): Promise<void> {
     await super.onConfigure();
     this.log.info('onConfigure called');
 
     this.interval = setInterval(
       () => {
         fireAndForget(
-          (async () => {
+          (async (): Promise<void> => {
             // istanbul ignore next
             if (!this.door || !this.history) return;
-            let contact = this.door.getAttribute(BooleanState.Cluster.id, 'stateValue', this.log);
+            let contact = this.door.getAttribute(BooleanState, 'stateValue', this.log);
             contact = !contact;
-            await this.door.setAttribute(BooleanState.Cluster.id, 'stateValue', contact, this.log);
-            await this.door.triggerEvent(BooleanState.Cluster.id, 'stateChange', { stateValue: contact }, this.log);
-            if (contact === false) this.history.addToTimesOpened();
+            await this.door.setAttribute(BooleanState, 'stateValue', contact, this.log);
+            await this.door.triggerEvent(BooleanState, 'stateChange', { stateValue: contact }, this.log);
+            if (!contact) this.history.addToTimesOpened();
             this.history.setLastEvent();
-            this.history.addEntry({ time: this.history.now(), contact: contact === true ? 0 : 1 });
+            this.history.addEntry({ time: this.history.now(), contact: contact ? 0 : 1 });
             this.log.info(`Set contact to ${contact}`);
 
-            let batteryLevel = this.door.getAttribute(PowerSource.Cluster.id, 'batPercentRemaining', this.log);
+            let batteryLevel = this.door.getAttribute(PowerSource, 'batPercentRemaining', this.log) ?? 0;
             batteryLevel = batteryLevel + 20 > 200 ? 10 : batteryLevel + 10;
-            await this.door.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', batteryLevel, this.log);
+            await this.door.setAttribute(PowerSource, 'batPercentRemaining', batteryLevel, this.log);
             if (batteryLevel >= 40) {
-              await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Ok, this.log);
+              await this.door.setAttribute(PowerSource, 'batChargeLevel', PowerSource.BatChargeLevel.Ok, this.log);
             } else if (batteryLevel >= 20) {
-              await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Warning, this.log);
+              await this.door.setAttribute(PowerSource, 'batChargeLevel', PowerSource.BatChargeLevel.Warning, this.log);
             } else {
-              await this.door.setAttribute(PowerSource.Cluster.id, 'batChargeLevel', PowerSource.BatChargeLevel.Critical, this.log);
+              await this.door.setAttribute(PowerSource, 'batChargeLevel', PowerSource.BatChargeLevel.Critical, this.log);
             }
           })(),
           this.log,
@@ -139,12 +139,12 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
     );
   }
 
-  override async onShutdown(reason?: string) {
+  override async onShutdown(reason?: string): Promise<void> {
     await super.onShutdown(reason);
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     await this.history?.close();
     clearInterval(this.interval);
     this.interval = undefined;
-    if (this.config.unregisterOnShutdown === true) await this.unregisterAllDevices();
+    if (this.config.unregisterOnShutdown) await this.unregisterAllDevices();
   }
 }
