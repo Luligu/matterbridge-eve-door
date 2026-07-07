@@ -1,7 +1,6 @@
 /**
- * This file contains the class EveDoorPlatform.
- *
- * @file module.ts
+ * @file src/module.ts
+ * @description This file contains the class EveDoorPlatform.
  * @author Luca Liguori
  * @version 2.0.0
  * @license Apache-2.0
@@ -109,7 +108,7 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
       () => {
         fireAndForget(
           (async (): Promise<void> => {
-            // istanbul ignore next
+            /* v8 ignore next */
             if (!this.door || !this.history) return;
             let contact = this.door.getAttribute(BooleanState, 'stateValue', this.log);
             contact = !contact;
