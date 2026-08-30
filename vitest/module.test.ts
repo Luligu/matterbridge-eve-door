@@ -77,12 +77,12 @@ describe('TestPlatform', () => {
   it('should initialize platform with config name', () => {
     testPlatform = new EveDoorPlatform(matterbridge, log, config);
     addMatterbridge(testPlatform);
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Initializing platform ${config.name}...`);
   });
 
   it('should call onStart with reason', async () => {
     await testPlatform.onStart('Test reason');
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onStart called with reason:', 'Test reason');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Starting platform ${config.name} with reason: Test reason...`);
     expect(testPlatform.door).toBeDefined();
     if (!testPlatform.door) return;
     expect(testPlatform.door.getAllClusterServerNames()).toEqual(['descriptor', 'matterbridge', 'identify', 'booleanState', 'powerSource', 'eveHistory']);
@@ -95,7 +95,7 @@ describe('TestPlatform', () => {
     vi.useFakeTimers();
 
     await testPlatform.onConfigure();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onConfigure called');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Configuring platform ${config.name}...`);
 
     // Simulate multiple interval executions
     for (let i = 0; i < 20; i++) {
@@ -128,6 +128,6 @@ describe('TestPlatform', () => {
     await testPlatform.onShutdown('Test reason');
     testPlatform.config.unregisterOnShutdown = true;
     await testPlatform.onShutdown();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'Test reason');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: Test reason...`);
   });
 });
