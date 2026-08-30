@@ -124,7 +124,9 @@ export class EveDoorPlatform extends MatterbridgeAccessoryPlatform {
             this.history.addEntry({ time: this.history.now(), contact: contact ? 0 : 1 });
             this.log.info(`Set contact to ${contact}`);
 
-            let batteryLevel = this.door.getAttribute(PowerSource, 'batPercentRemaining', this.log) ?? 0;
+            let batteryLevel = this.door.getAttribute(PowerSource, 'batPercentRemaining', this.log);
+            // v8 ignore next -- defensive nullish coalescing
+            batteryLevel ??= 0;
             batteryLevel = batteryLevel + 20 > 200 ? 10 : batteryLevel + 10;
             await this.door.setAttribute(PowerSource, 'batPercentRemaining', batteryLevel, this.log);
             if (batteryLevel >= 40) {
