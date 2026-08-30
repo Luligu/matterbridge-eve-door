@@ -86,6 +86,7 @@ describe('TestPlatform', () => {
     expect(testPlatform.door).toBeDefined();
     if (!testPlatform.door) return;
     expect(testPlatform.door.getAllClusterServerNames()).toEqual(['descriptor', 'matterbridge', 'identify', 'booleanState', 'powerSource', 'eveHistory']);
+    expect(testPlatform.history).toBeDefined();
   });
 
   it('should call onConfigure', async () => {
@@ -125,9 +126,34 @@ describe('TestPlatform', () => {
   });
 
   it('should call onShutdown with reason', async () => {
+    testPlatform.config.unregisterOnShutdown = true;
     await testPlatform.onShutdown('Test reason');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: Test reason...`);
+  });
+
+  it('should call onStart in bridge mode', async () => {
+    (testPlatform.matterbridge as any).bridgeMode = 'bridge';
+    await testPlatform.onStart();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Starting platform ${config.name} with reason: no reason provided...`);
+    expect(testPlatform.door).toBeDefined();
+    if (!testPlatform.door) return;
+    expect(testPlatform.door.getAllClusterServerNames()).toEqual(['descriptor', 'matterbridge', 'identify', 'booleanState', 'powerSource', 'eveHistory']);
+
     testPlatform.config.unregisterOnShutdown = true;
     await testPlatform.onShutdown();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: Test reason...`);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: no reason provided...`);
+  });
+
+  it('should call onStart in childbridge mode', async () => {
+    (testPlatform.matterbridge as any).bridgeMode = 'childbridge';
+    await testPlatform.onStart();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Starting platform ${config.name} with reason: no reason provided...`);
+    expect(testPlatform.door).toBeDefined();
+    if (!testPlatform.door) return;
+    expect(testPlatform.door.getAllClusterServerNames()).toEqual(['descriptor', 'matterbridge', 'identify', 'booleanState', 'powerSource', 'eveHistory']);
+
+    testPlatform.config.unregisterOnShutdown = true;
+    await testPlatform.onShutdown();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: no reason provided...`);
   });
 });
